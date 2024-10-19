@@ -1,5 +1,11 @@
-FROM --platform=linux/amd64 emscripten/emsdk
+FROM emscripten/emsdk
 LABEL maintainer="Emir Marques <emirdeliz@gmail.com>"
+
+RUN mkdir main && cd main
+
+RUN emsdk update
+RUN emsdk install 2.0.10
+RUN emsdk activate 2.0.10
 
 RUN apt-get update && \
     apt-get install -y \
@@ -16,8 +22,7 @@ RUN git clone https://github.com/opencv/opencv.git && ls && \
     make -j"$(nproc)" && \
     make install && ldconfig
 
+RUN python3 opencv/platforms/js/build_js.py build_wasm --build_wasm
+
 # Install node
 RUN apt-get -y update && apt-get -y install nodejs npm && npm install -g yarn
-
-RUN mkdir main
-WORKDIR /main
